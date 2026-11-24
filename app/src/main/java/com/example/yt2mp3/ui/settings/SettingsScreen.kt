@@ -4,33 +4,45 @@ import android.app.Application
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.SystemUpdate
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
@@ -58,6 +70,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -224,9 +237,30 @@ class SettingsViewModel(app: Application) : ViewModel() {
             rssAuto = s.getRssAuto()
         }
         viewModelScope.launch {
-            val bytes = yt.container.storage.storageUsageBytes()
-            storageUsage = com.example.yt2mp3.domain.model.SizeEstimator.formatBytes(bytes.coerceAtLeast(1))
+            refreshStorage()
         }
+    }
+
+    var storageBreakdown by mutableStateOf(com.example.yt2mp3.data.storage.StorageBreakdown())
+        private set
+    var isCleaningCache by mutableStateOf(false)
+        private set
+
+    fun refreshStorage() = viewModelScope.launch {
+        val bd = yt.container.storage.getStorageBreakdown()
+        storageBreakdown = bd
+        val bytes = bd.totalBytes
+        storageUsage = com.example.yt2mp3.domain.model.SizeEstimator.formatBytes(bytes.coerceAtLeast(1))
+    }
+
+    fun cleanupCache() = viewModelScope.launch {
+        if (isCleaningCache) return@launch
+        isCleaningCache = true
+        val freed = yt.container.storage.clearTempCache()
+        refreshStorage()
+        isCleaningCache = false
+        val formatted = if (freed > 0) com.example.yt2mp3.domain.model.SizeEstimator.formatBytes(freed) else "0 MB"
+        postNotice("Cache dibersihkan ($formatted dibebaskan).")
     }
 
     private fun savePost() = viewModelScope.launch {
@@ -675,8 +709,74 @@ fun SettingsScreen(
                 OutlinedButton(onClick = { picker.launch(null) }) { Text("Change folder") }
                 OutlinedButton(onClick = { vm.setHideGallery(true) }) { Text("Sembunyikan dari galeri") }
             }
-            vm.storageUsage?.let {
-                Text("Terpakai di folder tujuan: ± $it", style = MaterialTheme.typography.bodySmall)
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)),
+            ) {
+                Column(
+                    modifier = Modifier.padding(AppSpacing.md),
+                    verticalArrangement = Arrangement.spacedBy(AppSpacing.sm),
+                ) {
+                    Text("Distribusi Penyimpanan", style = MaterialTheme.typography.titleSmall)
+
+                    val bd = vm.storageBreakdown
+                    val total = (bd.audioBytes + bd.videoBytes + bd.otherBytes).coerceAtLeast(1L)
+                    val audioW = (bd.audioBytes.toFloat() / total).coerceIn(0f, 1f)
+                    val videoW = (bd.videoBytes.toFloat() / total).coerceIn(0f, 1f)
+                    val otherW = (bd.otherBytes.toFloat() / total).coerceIn(0f, 1f)
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(12.dp)
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
+                    ) {
+                        if (audioW > 0f) {
+                            Box(modifier = Modifier.weight(audioW).fillMaxHeight().background(androidx.compose.ui.graphics.Color(0xFF2E7D32)))
+                        }
+                        if (videoW > 0f) {
+                            Box(modifier = Modifier.weight(videoW).fillMaxHeight().background(androidx.compose.ui.graphics.Color(0xFF1976D2)))
+                        }
+                        if (otherW > 0f) {
+                            Box(modifier = Modifier.weight(otherW).fillMaxHeight().background(androidx.compose.ui.graphics.Color(0xFF757575)))
+                        }
+                        if (bd.totalBytes == 0L) {
+                            Box(modifier = Modifier.weight(1f).fillMaxHeight().background(MaterialTheme.colorScheme.outlineVariant))
+                        }
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        StorageLegend("Audio (${bd.audioCount})", formatStorageSize(bd.audioBytes), androidx.compose.ui.graphics.Color(0xFF2E7D32))
+                        StorageLegend("Video (${bd.videoCount})", formatStorageSize(bd.videoBytes), androidx.compose.ui.graphics.Color(0xFF1976D2))
+                        StorageLegend("Sisa Drive", formatStorageSize(bd.freeBytes), MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm),
+                    ) {
+                        OutlinedButton(
+                            onClick = { vm.cleanupCache() },
+                            modifier = Modifier.weight(1f),
+                            enabled = !vm.isCleaningCache,
+                        ) {
+                            Icon(Icons.Filled.DeleteSweep, contentDescription = null)
+                            Spacer(Modifier.width(AppSpacing.xs))
+                            Text(if (vm.isCleaningCache) "Membersihkan…" else "Bersihkan Cache")
+                        }
+                        OutlinedButton(
+                            onClick = { vm.refreshStorage() },
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            Icon(Icons.Filled.Refresh, contentDescription = null)
+                            Spacer(Modifier.width(AppSpacing.xs))
+                            Text("Pindai Ulang")
+                        }
+                    }
+                }
             }
             ToggleRow("Subfolder per playlist", "Simpan playlist/batch ke subfolder.", vm.subfolderAuto, vm::setSubfolder)
             ToggleRow("Lewati yang sudah ada", "Jangan antre ulang link di riwayat.", vm.skipExisting, vm::setSkip)
@@ -1188,4 +1288,28 @@ private fun CounterRow(title: String, value: Int, min: Int, max: Int, onChange: 
         Text("$value", modifier = Modifier.padding(horizontal = AppSpacing.sm))
         OutlinedButton(onClick = { onChange((value + 1).coerceAtMost(max)) }) { Text("+") }
     }
+}
+
+@Composable
+private fun StorageLegend(label: String, size: String, dotColor: androidx.compose.ui.graphics.Color) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Box(
+            modifier = Modifier
+                .size(8.dp)
+                .background(dotColor, androidx.compose.foundation.shape.CircleShape)
+        )
+        Spacer(Modifier.width(AppSpacing.xs))
+        Column {
+            Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(size, style = MaterialTheme.typography.bodySmall)
+        }
+    }
+}
+
+private fun formatStorageSize(bytes: Long): String {
+    val gb = bytes / 1_073_741_824.0
+    if (gb >= 1.0) return String.format(java.util.Locale.US, "%.1f GB", gb)
+    val mb = bytes / 1_048_576.0
+    return if (mb >= 1.0) String.format(java.util.Locale.US, "%.0f MB", mb)
+    else String.format(java.util.Locale.US, "%.0f KB", (bytes / 1024.0).coerceAtLeast(1.0))
 }

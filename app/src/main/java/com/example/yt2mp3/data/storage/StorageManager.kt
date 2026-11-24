@@ -6,6 +6,18 @@ import androidx.documentfile.provider.DocumentFile
 import com.example.yt2mp3.data.util.AppLog
 import com.example.yt2mp3.data.util.FileNameSanitizer
 import java.io.File
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+data class StorageBreakdown(
+    val audioBytes: Long = 0L,
+    val videoBytes: Long = 0L,
+    val otherBytes: Long = 0L,
+    val totalBytes: Long = 0L,
+    val freeBytes: Long = 0L,
+    val audioCount: Int = 0,
+    val videoCount: Int = 0,
+)
 
 /**
  * SAF storage abstraction (PRD §11, §29). Engine/queue never touch SAF directly.
@@ -25,6 +37,8 @@ interface StorageManager {
     suspend fun deleteOutput(outputUri: String): Boolean
     /** Total bytes of files in the destination tree (0 when unavailable). */
     suspend fun storageUsageBytes(): Long
+    suspend fun getStorageBreakdown(): StorageBreakdown
+    suspend fun clearTempCache(): Long
     /** Creates/deletes .nomedia to hide audio from gallery apps. */
     suspend fun setHideFromGallery(hide: Boolean): Boolean
 }
@@ -133,6 +147,80 @@ class SafStorageManager(
             AppLog.w("STORAGE", "usage check failed", t)
             0L
         }
+    }
+
+    override suspend fun getStorageBreakdown(): StorageBreakdown = withContext(Dispatchers.IO) {
+        val raw = getDestinationUri() ?: return@withContext StorageBreakdown()
+        try {
+            val tree = DocumentFile.fromTreeUri(context, Uri.parse(raw)) ?: return@withContext StorageBreakdown()
+            var audio = 0L
+            var video = 0L
+            var other = 0L
+            var audioCnt = 0
+            var videoCnt = 0
+
+            val audioExts = setOf("mp3", "m4a", "opus", "ogg", "flac", "wav")
+            val videoExts = setOf("mp4", "mkv", "webm")
+
+            fun scan(dir: DocumentFile) {
+                for (f in dir.listFiles()) {
+                    if (f.isDirectory) {
+                        scan(f)
+                    } else {
+                        val len = f.length().coerceAtLeast(0)
+                        val ext = f.name?.substringAfterLast('.', "")?.lowercase().orEmpty()
+                        when {
+                            ext in audioExts -> {
+                                audio += len
+                                audioCnt++
+                            }
+                            ext in videoExts -> {
+                                video += len
+                                videoCnt++
+                            }
+                            else -> {
+                                other += len
+                            }
+                        }
+                    }
+                }
+            }
+            scan(tree)
+
+            val free = runCatching {
+                val dir = context.getExternalFilesDir(null) ?: context.filesDir
+                android.os.StatFs(dir.absolutePath).availableBytes
+            }.getOrDefault(0L)
+
+            StorageBreakdown(
+                audioBytes = audio,
+                videoBytes = video,
+                otherBytes = other,
+                totalBytes = audio + video + other,
+                freeBytes = free,
+                audioCount = audioCnt,
+                videoCount = videoCnt,
+            )
+        } catch (t: Throwable) {
+            AppLog.w("STORAGE", "breakdown check failed", t)
+            StorageBreakdown()
+        }
+    }
+
+    override suspend fun clearTempCache(): Long = withContext(Dispatchers.IO) {
+        var freed = 0L
+        try {
+            val cacheDir = context.cacheDir
+            cacheDir.listFiles()?.forEach { file ->
+                if (file.name.startsWith("tmp") || file.name.startsWith("tag_") || file.name.startsWith("update") || file.isDirectory) {
+                    freed += file.length()
+                    file.deleteRecursively()
+                }
+            }
+        } catch (t: Throwable) {
+            AppLog.w("STORAGE", "clear temp cache failed", t)
+        }
+        freed
     }
 
     override suspend fun setHideFromGallery(hide: Boolean): Boolean {
