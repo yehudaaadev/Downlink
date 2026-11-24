@@ -34,5 +34,5 @@ Downlink (sebelumnya YT2MP3) adalah aplikasi Android offline media downloader & 
 - [x] Fitur 4: Interactive Stream Inspector (Daftar stream video/audio detail sebelum unduh)
 
 ## Langkah Berikutnya
-- Jalankan build APK rilis v1.5.0: `.\gradlew.bat :app:assembleRelease`
-- Unggah file APK rilis (`downlink-arm64-v8a-release.apk` dan `downlink-armeabi-v7a-release.apk`) ke GitHub Releases v1.5.0.
+- [x] Jalankan build APK rilis v1.5.0: `.\gradlew.bat :app:assembleRelease`
+- [x] Unggah file APK rilis (`downlink-arm64-v8a-release.apk` dan `downlink-armeabi-v7a-release.apk`) ke GitHub Releases v1.5.0.

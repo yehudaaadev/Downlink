@@ -28,6 +28,6 @@ atau pre-release, agar endpoint `/releases/latest` mengembalikannya.
 - [x] Unit test lolos
 - [x] APK release ditandatangani keystore rilis yang sama dengan 1.4.0
 - [x] Commit + tag `v1.5.0`, push
-- [ ] Buat GitHub Release `v1.5.0` + unggah 2 APK
+- [x] Buat GitHub Release `v1.5.0` + unggah 2 APK
 - [ ] Uji update dari v1.4.0 tanpa uninstall (signature harus sama)
 - [ ] Cek dialog update membaca rilis ini
