@@ -28,6 +28,7 @@ object Profiles {
                     .put("langs", p.post.subLangs)
                     .put("chapters", p.post.embedChapters)
                     .put("sponsor", p.post.sponsorBlock)
+                    .put("sponsorCats", p.post.sponsorCategories)
                     .put("norm", p.post.normalizeAudio)
                     .put("thumb", p.post.saveThumbSeparate)
                     .put("strip", p.post.stripMetadata),
@@ -55,6 +56,7 @@ object Profiles {
                         subLangs = o.optString("langs", "en,id"),
                         embedChapters = o.optBoolean("chapters"),
                         sponsorBlock = o.optBoolean("sponsor"),
+                        sponsorCategories = o.optString("sponsorCats", com.example.yt2mp3.domain.model.SponsorCategory.DEFAULT_CATEGORIES),
                         normalizeAudio = o.optBoolean("norm"),
                         saveThumbSeparate = o.optBoolean("thumb"),
                         stripMetadata = o.optBoolean("strip"),

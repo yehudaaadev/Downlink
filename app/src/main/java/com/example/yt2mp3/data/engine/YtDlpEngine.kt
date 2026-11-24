@@ -381,6 +381,9 @@ class YtDlpEngineImpl(context: Context) : YtDlpEngine {
             if (post.normalizeAudio) {
                 addOption("--postprocessor-args", "ffmpeg:-af loudnorm=I=-16:TP=-1.5:LRA=11")
             }
+            if (post.sponsorBlock) {
+                addOption("--sponsorblock-remove", post.sponsorCategories.ifBlank { "sponsor" })
+            }
             tuning.customFfmpegArgs.trim().takeIf { it.isNotEmpty() }?.let {
                 addOption("--postprocessor-args", "ffmpeg:$it")
             }
@@ -463,7 +466,9 @@ class YtDlpEngineImpl(context: Context) : YtDlpEngine {
                 addOption("--convert-thumbnails", "jpg")
                 if (post.embedChapters) addOption("--embed-chapters")
             }
-            if (post.sponsorBlock) addOption("--sponsorblock-remove", "sponsor")
+            if (post.sponsorBlock) {
+                addOption("--sponsorblock-remove", post.sponsorCategories.ifBlank { "sponsor" })
+            }
             when (post.subtitleMode) {
                 SubtitleMode.EMBED -> {
                     addOption("--write-subs")
@@ -481,6 +486,9 @@ class YtDlpEngineImpl(context: Context) : YtDlpEngine {
             }
             if (post.normalizeAudio) {
                 addOption("--postprocessor-args", "ffmpeg:-af loudnorm=I=-16:TP=-1.5:LRA=11")
+            }
+            if (post.sponsorBlock) {
+                addOption("--sponsorblock-remove", post.sponsorCategories.ifBlank { "sponsor" })
             }
             tuning.customFfmpegArgs.trim().takeIf { it.isNotEmpty() }?.let {
                 addOption("--postprocessor-args", "ffmpeg:$it")

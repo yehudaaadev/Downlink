@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -107,6 +108,8 @@ class SettingsViewModel(app: Application) : ViewModel() {
         private set
     var postSponsor by mutableStateOf(false)
         private set
+    var postSponsorCategories by mutableStateOf(com.example.yt2mp3.domain.model.SponsorCategory.DEFAULT_CATEGORIES)
+        private set
     var postNormalize by mutableStateOf(false)
         private set
     var postThumb by mutableStateOf(false)
@@ -189,6 +192,7 @@ class SettingsViewModel(app: Application) : ViewModel() {
             val post = s.getPostFlags()
             postChapters = post.embedChapters
             postSponsor = post.sponsorBlock
+            postSponsorCategories = post.sponsorCategories
             postNormalize = post.normalizeAudio
             postThumb = post.saveThumbSeparate
             postStrip = post.stripMetadata
@@ -232,6 +236,7 @@ class SettingsViewModel(app: Application) : ViewModel() {
                 subLangs = subLangs,
                 embedChapters = postChapters,
                 sponsorBlock = postSponsor,
+                sponsorCategories = postSponsorCategories,
                 normalizeAudio = postNormalize,
                 saveThumbSeparate = postThumb,
                 stripMetadata = postStrip,
@@ -275,6 +280,11 @@ class SettingsViewModel(app: Application) : ViewModel() {
             "thumb" -> postThumb = v
             "strip" -> postStrip = v
         }
+        savePost()
+    }
+
+    fun toggleSponsorCategory(cat: com.example.yt2mp3.domain.model.SponsorCategory) {
+        postSponsorCategories = com.example.yt2mp3.domain.model.SponsorCategory.toggleCategory(postSponsorCategories, cat)
         savePost()
     }
 
@@ -746,7 +756,36 @@ fun SettingsScreen(
                 singleLine = true,
             )
             ToggleRow("Embed chapters", "Simpan penanda bab.", vm.postChapters) { vm.togglePost("chapters", it) }
-            ToggleRow("SponsorBlock", "Hapus segmen sponsor.", vm.postSponsor) { vm.togglePost("sponsor", it) }
+            ToggleRow("SponsorBlock", "Hapus segmen sponsor dan pengganggu.", vm.postSponsor) { vm.togglePost("sponsor", it) }
+            if (vm.postSponsor) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = AppSpacing.sm, bottom = AppSpacing.xs),
+                    verticalArrangement = Arrangement.spacedBy(AppSpacing.xs),
+                ) {
+                    Text(
+                        "Kategori yang dihapus:",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs),
+                    ) {
+                        com.example.yt2mp3.domain.model.SponsorCategory.entries.forEach { cat ->
+                            val selected = com.example.yt2mp3.domain.model.SponsorCategory.isCategorySelected(vm.postSponsorCategories, cat)
+                            FilterChip(
+                                selected = selected,
+                                onClick = { vm.toggleSponsorCategory(cat) },
+                                label = { Text(cat.label, style = MaterialTheme.typography.labelSmall) },
+                            )
+                        }
+                    }
+                }
+            }
             ToggleRow("Normalisasi loudness", "Samakan volume.", vm.postNormalize) { vm.togglePost("norm", it) }
             ToggleRow("Thumbnail terpisah", "Simpan cover JPG.", vm.postThumb) { vm.togglePost("thumb", it) }
             ToggleRow("Hapus metadata (privasi)", "Tanpa embed tag/thumbnail.", vm.postStrip) { vm.togglePost("strip", it) }

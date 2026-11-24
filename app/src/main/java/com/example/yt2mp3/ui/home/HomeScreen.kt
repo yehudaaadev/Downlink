@@ -51,6 +51,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -1103,6 +1104,38 @@ private fun AdvancedOptions(state: HomeScreenState, vm: HomeViewModel) {
         }
         CheckRow("SponsorBlock", "Hapus segmen sponsor (konten publik).", post.sponsorBlock) { v ->
             vm.onPostChange { it.copy(sponsorBlock = v) }
+        }
+        if (post.sponsorBlock) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = AppSpacing.sm, bottom = AppSpacing.xs),
+                verticalArrangement = Arrangement.spacedBy(AppSpacing.xs),
+            ) {
+                Text(
+                    "Pilih segmen yang ingin dihapus:",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs),
+                ) {
+                    com.example.yt2mp3.domain.model.SponsorCategory.entries.forEach { cat ->
+                        val selected = com.example.yt2mp3.domain.model.SponsorCategory.isCategorySelected(post.sponsorCategories, cat)
+                        FilterChip(
+                            selected = selected,
+                            onClick = {
+                                val updated = com.example.yt2mp3.domain.model.SponsorCategory.toggleCategory(post.sponsorCategories, cat)
+                                vm.onPostChange { it.copy(sponsorCategories = updated) }
+                            },
+                            label = { Text(cat.label, style = MaterialTheme.typography.labelSmall) },
+                        )
+                    }
+                }
+            }
         }
         CheckRow("Normalisasi loudness", "Samakan volume (EBU R128).", post.normalizeAudio) { v ->
             vm.onPostChange { it.copy(normalizeAudio = v) }

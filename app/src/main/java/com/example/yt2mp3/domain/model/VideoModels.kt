@@ -44,12 +44,41 @@ enum class SubtitleMode(val label: String) {
     }
 }
 
+enum class SponsorCategory(val id: String, val label: String) {
+    SPONSOR("sponsor", "Sponsor"),
+    INTRO_OUTRO("intro,outro", "Intro/Outro"),
+    MUSIC_OFFTOPIC("music_offtopic", "Non-music Klip"),
+    SELFPROMO("selfpromo", "Self-promo"),
+    INTERACTION("interaction", "Ajakan Like/Sub");
+
+    companion object {
+        const val DEFAULT_CATEGORIES = "sponsor,music_offtopic"
+
+        fun isCategorySelected(current: String, category: SponsorCategory): Boolean {
+            val tokens = current.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+            return category.id.split(",").all { tokens.contains(it) }
+        }
+
+        fun toggleCategory(current: String, category: SponsorCategory): String {
+            val tokens = current.split(",").map { it.trim() }.filter { it.isNotEmpty() }.toMutableSet()
+            val catTokens = category.id.split(",")
+            if (isCategorySelected(current, category)) {
+                tokens.removeAll(catTokens.toSet())
+            } else {
+                tokens.addAll(catTokens)
+            }
+            return if (tokens.isEmpty()) SPONSOR.id else tokens.joinToString(",")
+        }
+    }
+}
+
 /** Post-processing flags attached to one queued item. */
 data class PostOptions(
     val subtitleMode: SubtitleMode = SubtitleMode.NONE,
     val subLangs: String = "en,id",
     val embedChapters: Boolean = false,
     val sponsorBlock: Boolean = false,
+    val sponsorCategories: String = SponsorCategory.DEFAULT_CATEGORIES,
     val normalizeAudio: Boolean = false,
     val saveThumbSeparate: Boolean = false,
     /** Privacy: skip all metadata/thumbnail embedding. */

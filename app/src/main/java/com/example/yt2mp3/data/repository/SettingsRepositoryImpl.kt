@@ -37,6 +37,7 @@ class SettingsRepositoryImpl(private val context: Context) : SettingsRepository 
     private val subLangsKey = stringPreferencesKey("sub_langs")
     private val chaptersKey = booleanPreferencesKey("embed_chapters")
     private val sponsorKey = booleanPreferencesKey("sponsor_block")
+    private val sponsorCategoriesKey = stringPreferencesKey("sponsor_categories")
     private val normalizeKey = booleanPreferencesKey("normalize_audio")
     private val saveThumbKey = booleanPreferencesKey("save_thumb")
     private val stripKey = booleanPreferencesKey("strip_metadata")
@@ -155,6 +156,7 @@ class SettingsRepositoryImpl(private val context: Context) : SettingsRepository 
             subLangs = p[subLangsKey] ?: "en,id",
             embedChapters = p[chaptersKey] == true,
             sponsorBlock = p[sponsorKey] == true,
+            sponsorCategories = p[sponsorCategoriesKey] ?: com.example.yt2mp3.domain.model.SponsorCategory.DEFAULT_CATEGORIES,
             normalizeAudio = p[normalizeKey] == true,
             saveThumbSeparate = p[saveThumbKey] == true,
             stripMetadata = p[stripKey] == true,
@@ -167,6 +169,7 @@ class SettingsRepositoryImpl(private val context: Context) : SettingsRepository 
             it[subLangsKey] = post.subLangs.take(60)
             it[chaptersKey] = post.embedChapters
             it[sponsorKey] = post.sponsorBlock
+            it[sponsorCategoriesKey] = post.sponsorCategories
             it[normalizeKey] = post.normalizeAudio
             it[saveThumbKey] = post.saveThumbSeparate
             it[stripKey] = post.stripMetadata
