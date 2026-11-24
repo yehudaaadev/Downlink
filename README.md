@@ -10,15 +10,38 @@ Aplikasi Android native (Kotlin, Jetpack Compose, MVVM) untuk mengunduh dan meng
 
 ---
 
-## Unduhan Langsung APK (v1.5.0)
+## Pilihan Berkas Unduhan APK (v1.5.0)
 
-| Berkas Aset | Target Perangkat | Arsitektur (ABI) | Perkiraan Ukuran | Tautan Unduh |
-|---|---|---|---|---|
-| `downlink-arm64-v8a-release.apk` | Mayoritas smartphone modern | 64-bit (`arm64-v8a`) | ~60 MB | [Unduh Langsung](https://github.com/yehudaaadev/Downlink/releases/latest/download/downlink-arm64-v8a-release.apk) |
-| `downlink-armeabi-v7a-release.apk` | Perangkat lawas / hemat daya | 32-bit (`armeabi-v7a`) | ~53 MB | [Unduh Langsung](https://github.com/yehudaaadev/Downlink/releases/latest/download/downlink-armeabi-v7a-release.apk) |
+Pilih berkas instalasi sesuai dengan tipe prosesor perangkat:
+
+### 1. Perangkat Modern — 64-bit (Rekomendasi Utama)
+Ditujukan untuk hampir seluruh smartphone Android modern (keluaran 2017 ke atas). Menawarkan performa decoding audio/video dan kecepatan engine yt-dlp paling optimal.
+
+[![Unduh Versi 64-bit](https://img.shields.io/badge/Unduh_APK_64--bit-ARM64_(~60_MB)-238636?style=for-the-badge&logo=android&logoColor=white)](https://github.com/yehudaaadev/Downlink/releases/latest/download/downlink-arm64-v8a-release.apk)
+
+- **Nama Berkas**: `downlink-arm64-v8a-release.apk`
+- **Arsitektur (ABI)**: `arm64-v8a` (AArch64)
+- **Kompatibilitas**: Android 11+ (API level 30+) pada chipset 64-bit
+- **Ukuran Berkas**: ~60 MB
+- **Tautan Langsung**: [Unduh downlink-arm64-v8a-release.apk](https://github.com/yehudaaadev/Downlink/releases/latest/download/downlink-arm64-v8a-release.apk)
+
+---
+
+### 2. Perangkat Lawas — 32-bit (Kompatibilitas)
+Ditujukan untuk perangkat Android lawas atau tipe chipset hemat daya yang hanya mendukung instruksi 32-bit.
+
+[![Unduh Versi 32-bit](https://img.shields.io/badge/Unduh_APK_32--bit-ARMv7_(~53_MB)-1f2328?style=for-the-badge&logo=android&logoColor=white)](https://github.com/yehudaaadev/Downlink/releases/latest/download/downlink-armeabi-v7a-release.apk)
+
+- **Nama Berkas**: `downlink-armeabi-v7a-release.apk`
+- **Arsitektur (ABI)**: `armeabi-v7a` (ARM 32-bit)
+- **Kompatibilitas**: Android 11+ pada chipset 32-bit
+- **Ukuran Berkas**: ~53 MB
+- **Tautan Langsung**: [Unduh downlink-armeabi-v7a-release.apk](https://github.com/yehudaaadev/Downlink/releases/latest/download/downlink-armeabi-v7a-release.apk)
+
+---
 
 > [!NOTE]
-> Ukuran berkas APK mencakup runtime Python, binary native FFmpeg, dan engine yt-dlp terintegrasi agar aplikasi dapat beroperasi mandiri secara offline.
+> Jika tidak yakin dengan tipe prosesor yang digunakan, pasang versi **64-bit** terlebih dahulu. Sistem operasi Android akan otomatis menolak instalasi paket jika arsitektur tidak cocok tanpa membahayakan perangkat. Ukuran berkas APK mencakup runtime Python, binary native FFmpeg, dan engine yt-dlp terintegrasi agar aplikasi dapat beroperasi mandiri secara offline.
 
 ---
 
