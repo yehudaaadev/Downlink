@@ -218,7 +218,6 @@ class QueueRunner(
 
             downloads.updateStatus(id, DownloadStatus.CONVERTING)
             emit(id, DownloadStatus.CONVERTING, 100, "Converting")
-            downloads.updateStatus(id, DownloadStatus.CONVERTING) // persist stage
             if (item.mediaKind == MediaKind.AUDIO && item.format == AudioFormat.MP3 && !post.stripMetadata) {
                 // MP3 tags + cover via Id3Writer (other formats are tagged by yt-dlp/ffmpeg).
                 Id3Writer.writeMp3Tags(mainFile, meta)

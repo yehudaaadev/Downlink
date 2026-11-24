@@ -144,4 +144,7 @@ interface DownloadDao {
 
     @Query("DELETE FROM downloads WHERE status IN ('COMPLETED','FAILED','CANCELLED')")
     suspend fun clearTerminal(): Int
+
+    @Query("UPDATE downloads SET title = :title, artist = :artist WHERE id = :id")
+    suspend fun updateTitleArtist(id: Long, title: String, artist: String?)
 }

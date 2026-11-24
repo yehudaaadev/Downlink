@@ -112,4 +112,7 @@ class DownloadRepositoryImpl(private val dao: DownloadDao) : DownloadRepository 
         val min = snap.minOfOrNull { it.createdAt } ?: System.currentTimeMillis()
         dao.updateCreatedAt(id, min - 1)
     }
+
+    override suspend fun updateTitleArtist(id: Long, title: String, artist: String?) =
+        dao.updateTitleArtist(id, title, artist)
 }

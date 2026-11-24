@@ -74,8 +74,8 @@ class DownloadForegroundService : LifecycleService() {
                 lastItemId = ev.itemId
                 lastTitle = item?.title ?: lastTitle
                 when {
-                    ev.status.isActive || ev.status == DownloadStatus.DOWNLOADING || ev.status == DownloadStatus.QUEUED -> {
-                        startForegroundWith(lastTitle.ifBlank { "YT2MP3" }, ev.percent, ev.itemId)
+                    ev.status.isActive || ev.status == DownloadStatus.QUEUED -> {
+                        startForegroundWith(lastTitle.ifBlank { "Downlink" }, ev.percent, ev.itemId)
                     }
                     ev.status == DownloadStatus.COMPLETED -> {
                         val done = item
@@ -124,7 +124,7 @@ class DownloadForegroundService : LifecycleService() {
         val mgr = getSystemService(NOTIFICATION_SERVICE) as android.app.NotificationManager
         mgr.notify(
             (System.currentTimeMillis() % Int.MAX_VALUE).toInt(),
-            DownloadNotifications.finished(this, title.ifBlank { "YT2MP3" }, ok, openUri, mime),
+            DownloadNotifications.finished(this, title.ifBlank { "Downlink" }, ok, openUri, mime),
         )
     }
 

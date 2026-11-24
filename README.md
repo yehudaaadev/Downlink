@@ -1,11 +1,11 @@
-# YT2MP3 — Pengunduh Audio/Video Publik (1000+ Situs)
+# Downlink — Pengunduh Audio/Video Publik (1000+ Situs)
 
 Aplikasi Android langsung-jadi-APK (Kotlin, Compose, MVVM). Tempel/share link →
 preview → pilih format → unduh di foreground → tersimpan via SAF (SD card OK) →
 riwayat. Engine (yt-dlp via youtubedl-android + FFmpeg) jalan penuh di HP;
 tanpa server, tanpa akun, tanpa iklan.
 
-## Yang bisa dilakukan (v1.4.0)
+## Yang bisa dilakukan (v1.5.0)
 
 - **Situs**: link publik apa pun yang didukung yt-dlp (1000+ situs) — YouTube
   (video, Shorts, live, playlist, channel, Music, podcast), TikTok, Instagram,
@@ -22,11 +22,12 @@ tanpa server, tanpa akun, tanpa iklan.
   bukan Wi-Fi, batas kecepatan, jadwal harian, RSS channel publik
   (auto-download video baru, maks 5).
 - **Library**: pemutar bawaan (audio/video + sleep timer), favorit, cari,
-  sortir, cek duplikat, rename, bagikan file/link, buka dengan aplikasi lain.
+  sortir, cek duplikat, rename, edit tag MP3 (judul/artis), bagikan
+  file/link, buka dengan aplikasi lain.
 - **Tampilan**: terang/gelap/AMOLED, Material You dinamis, mode sederhana
   (default) vs advanced, chip pintasan situs (YouTube/TikTok/IG/FB/X/
-  SoundCloud, ikon Material tanpa emoji), tempel otomatis
-  dari clipboard (opt-in), tile Quick Settings, App Shortcuts.
+  SoundCloud, ikon Material tanpa emoji), tempel otomatis dari clipboard
+  (opt-in), scan QR untuk memasukkan link, tile Quick Settings, App Shortcuts.
 - **Pengaturan**: menu per-halaman (Penyimpanan, Output, Antrean, Jadwal,
   Tampilan, Privasi, Lanjutan, Engine, Bantuan, Background, Legal).
 - **Privasi**: kunci PIN + biometrik, mode incognito (tanpa riwayat), proxy
@@ -58,8 +59,8 @@ $env:JAVA_HOME="C:\Program Files\Java\jdk-17.0.12"
 ```
 
 Terverifikasi: `assembleDebug`, `assembleRelease` (R8 + release lint), dan
-**54 unit test lolos, 0 gagal**. APK rilis (ABI split): arm64 ~57 MB,
-armeabi-v7a ~51 MB (berisi Python + FFmpeg + yt-dlp natives).
+**54 unit test lolos, 0 gagal**. APK rilis (ABI split): arm64 ~60 MB,
+armeabi-v7a ~53 MB (berisi Python + FFmpeg + yt-dlp natives).
 
 Rilis:
 
@@ -76,7 +77,7 @@ Jalankan unit test:
 
 ## Lisensi
 
-Kode aplikasi YT2MP3 berlisensi **MIT** — lihat file `LICENSE`. Bebas dipakai,
+Kode aplikasi Downlink berlisensi **MIT** — lihat file `LICENSE`. Bebas dipakai,
 diubah, dan disebarkan dengan mencantumkan copyright. Komponen pihak ketiga
 (yt-dlp, youtubedl-android, FFmpeg, AndroidX) ikut lisensinya masing-masing.
 

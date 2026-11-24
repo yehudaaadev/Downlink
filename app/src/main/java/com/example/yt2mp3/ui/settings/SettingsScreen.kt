@@ -533,7 +533,7 @@ class SettingsViewModel(app: Application) : ViewModel() {
 
     fun diagnostics(): String {
         return buildString {
-            appendLine("YT2MP3 ${com.example.yt2mp3.BuildConfig.VERSION_NAME}")
+            appendLine("Downlink ${com.example.yt2mp3.BuildConfig.VERSION_NAME}")
             appendLine("Engine: ${engineVersion ?: "?"}")
             appendLine("Tujuan: ${destination.value?.takeLast(40) ?: "-"}")
             appendLine("Output: ${mediaKind.value}/${format.value.label} ${quality.value.label} / " +
@@ -927,7 +927,7 @@ fun SettingsScreen(
             if (section == SettingsSection.BATTERY) {
             Section("Background downloads")
             Text(
-                "If downloads stop with the screen off, exempt YT2MP3 from battery optimization.",
+                "If downloads stop with the screen off, exempt Downlink from battery optimization.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -945,7 +945,7 @@ fun SettingsScreen(
             if (section == SettingsSection.LEGAL) {
             Section("Legal")
             Text(
-                "YT2MP3 ${com.example.yt2mp3.BuildConfig.VERSION_NAME} — hanya konten publik yang boleh disimpan untuk offline pribadi. " +
+                "Downlink ${com.example.yt2mp3.BuildConfig.VERSION_NAME} — hanya konten publik yang boleh disimpan untuk offline pribadi. " +
                     "Tanpa login/cookies: konten privat, berbayar, dan DRM tidak didukung dan tidak di-bypass. " +
                     "Tanpa watermark stripping. Patuhi syarat layanan tiap situs.",
                 style = MaterialTheme.typography.bodySmall,
@@ -995,8 +995,13 @@ fun SettingsScreen(
             title = { Text("Changelog ${com.example.yt2mp3.BuildConfig.VERSION_NAME}") },
             text = {
                 Text(
-                    "• Video MP4/MKV/WEBM 144p–4K\n" +
-                        "• Audio OPUS/OGG/FLAC/WAV + MP3 64–320k\n" +
+                    "Baru di 1.5.0\n" +
+                        "• Edit tag MP3 (judul/artis) dari riwayat; file yang tersimpan ikut diperbarui\n" +
+                        "• Scan QR untuk memasukkan link\n" +
+                        "• Baris tombol input bisa digeser di layar sempit\n" +
+                        "• Perbaikan: notifikasi tidak hilang saat konversi, penulisan tag tidak dobel\n\n" +
+                        "1.4.0\n" +
+                        "• Video MP4/MKV/WEBM 144p–4K, audio OPUS/OGG/FLAC/WAV + MP3 64–320k\n" +
                         "• Batch + import TXT/CSV/JSON + range + lewati-ada + subfolder\n" +
                         "• Channel/playlist generik, profil, pola nama file\n" +
                         "• Subtitle/chapters/SponsorBlock/normalisasi/thumbnail\n" +

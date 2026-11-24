@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">YT2MP3</string>
+    <string name="app_name">Downlink</string>
     <string name="notif_channel_name">Downloads</string>
-    <string name="notif_channel_desc">Shows YT2MP3 download progress</string>
+    <string name="notif_channel_desc">Shows Downlink download progress</string>
     <string name="notif_downloading">Downloading</string>
     <string name="notif_preparing">Preparing download…</string>
     <string name="notif_complete">Download complete: %1$s</string>
@@ -9,5 +9,5 @@
     <string name="cancel">Cancel</string>
     <string name="open">Open</string>
     <string name="shortcut_paste">Tempel &amp; unduh</string>
-    <string name="shortcut_open">Buka YT2MP3</string>
+    <string name="shortcut_open">Buka Downlink</string>
 </resources>

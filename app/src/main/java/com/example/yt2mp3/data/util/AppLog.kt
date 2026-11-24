@@ -7,7 +7,7 @@ import java.util.Locale
 
 /** Structured logging with an in-memory ring buffer for the in-app log viewer. */
 object AppLog {
-    private const val PREFIX = "YT2MP3"
+    private const val PREFIX = "Downlink"
     private const val CAP = 300
     private val lock = Any()
     private val ring = ArrayDeque<String>()

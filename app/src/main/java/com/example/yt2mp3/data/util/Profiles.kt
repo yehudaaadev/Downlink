@@ -113,7 +113,7 @@ object RssFeed {
         try {
             conn.connectTimeout = 15000
             conn.readTimeout = 15000
-            conn.setRequestProperty("User-Agent", "YT2MP3")
+            conn.setRequestProperty("User-Agent", "Downlink")
             val code = conn.responseCode
             if (code != 200) throw IllegalStateException("RSS HTTP $code")
             val xml = conn.inputStream.use { it.readBytes().decodeToString() }

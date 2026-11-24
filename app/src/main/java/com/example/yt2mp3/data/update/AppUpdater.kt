@@ -19,7 +19,7 @@ data class AppUpdate(val version: String, val apkUrl: String, val notes: String?
  * matching this phone's ABI and hands it to the system installer (user taps "Install" once).
  */
 object AppUpdater {
-    private const val LATEST = "https://api.github.com/repos/davidyehuda45-byte/mp3apk/releases/latest"
+    private const val LATEST = "https://api.github.com/repos/yehudaaadev/Downlink/releases/latest"
 
     /** Newer release than the installed one, or null (also on any network/parse error). */
     suspend fun check(): AppUpdate? = withContext(Dispatchers.IO) {
@@ -91,7 +91,7 @@ object AppUpdater {
             readTimeout = 30_000
             instanceFollowRedirects = true
             setRequestProperty("Accept", accept)
-            setRequestProperty("User-Agent", "YT2MP3/${BuildConfig.VERSION_NAME}")
+            setRequestProperty("User-Agent", "Downlink/${BuildConfig.VERSION_NAME}")
             if (responseCode !in 200..299) throw IllegalStateException("HTTP $responseCode")
         }
 }

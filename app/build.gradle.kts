@@ -19,8 +19,9 @@ android {
         applicationId = "com.example.yt2mp3"
         minSdk = 30
         targetSdk = 34
-        versionCode = 5
-        versionName = "1.4.0"
+        versionCode = 6
+        versionName = "1.5.0"
+        setProperty("archivesBaseName", "downlink")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }

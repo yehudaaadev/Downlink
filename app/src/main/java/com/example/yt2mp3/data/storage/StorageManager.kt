@@ -154,7 +154,7 @@ class SafStorageManager(
 
     private fun sanitizeFolder(name: String): String {
         var base = name.trim().replace(Regex("""[/\\:*?"<>|]"""), "_").replace(Regex("""\s+"""), " ").trim(' ', '.', '_')
-        if (base.isEmpty()) base = "YT2MP3"
+        if (base.isEmpty()) base = "Downlink"
         return base.take(80)
     }
 

@@ -120,7 +120,7 @@ fun LockScreen(
     fun biometric() {
         if (Build.VERSION.SDK_INT < 29 || activity == null) return
         val prompt = BiometricPrompt.Builder(context)
-            .setTitle("Buka YT2MP3")
+            .setTitle("Buka Downlink")
             .setNegativeButton("PIN", activity.mainExecutor, { _, _ -> })
             .build()
         prompt.authenticate(
@@ -140,7 +140,7 @@ fun LockScreen(
             .padding(AppSpacing.screen),
         verticalArrangement = Arrangement.spacedBy(AppSpacing.group),
     ) {
-        Text("YT2MP3 terkunci", style = MaterialTheme.typography.titleLarge)
+        Text("Downlink terkunci", style = MaterialTheme.typography.titleLarge)
         Text(
             if (!vm.hasPin) "Buat PIN 4+ digit untuk mengunci aplikasi."
             else "Masukkan PIN untuk membuka.",

@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.StarOutline
@@ -151,6 +152,32 @@ class HistoryViewModel(app: Application) : ViewModel() {
         } else {
             onDone(false)
         }
+    }
+
+    /**
+     * Rewrites the ID3v2 title/artist tags of an already-saved MP3, then updates
+     * the history entry in Room so the list reflects the change immediately.
+     * Only valid for completed MP3s with a non-null outputUri.
+     */
+    fun editTags(
+        item: DownloadItem,
+        title: String,
+        artist: String,
+        onDone: (Boolean) -> Unit = {},
+    ) = viewModelScope.launch {
+        val uri = item.outputUri ?: return@launch onDone(false)
+        val cleanTitle = title.trim().take(200).ifBlank { item.title }
+        val cleanArtist = artist.trim().take(200).ifBlank { null }
+        val ok = com.example.yt2mp3.data.storage.Id3Writer.rewriteTags(
+            yt.applicationContext,
+            uri,
+            cleanTitle,
+            cleanArtist,
+        )
+        if (ok) {
+            yt.downloads.updateTitleArtist(item.id, cleanTitle, cleanArtist)
+        }
+        onDone(ok)
     }
 
     companion object {
@@ -300,6 +327,9 @@ fun HistoryScreen(
                 onRename = { name ->
                     vm.rename(item, name) { selected = null }
                 },
+                onEditTags = { title, artist ->
+                    vm.editTags(item, title, artist) { selected = null }
+                },
                 onPlay = {
                     selected = null
                     onPlay(item.id)
@@ -395,11 +425,13 @@ private fun DetailSheet(
     onDeleteFile: () -> Unit,
     onFav: () -> Unit,
     onRename: (String) -> Unit,
+    onEditTags: (title: String, artist: String) -> Unit,
     onPlay: () -> Unit,
 ) {
     val context = LocalContext.current
     val clipboard = LocalClipboardManager.current
     var showRename by remember { mutableStateOf(false) }
+    var showEditTags by remember { mutableStateOf(false) }
     var newName by remember(item.id) { mutableStateOf(item.outputFileName.substringBeforeLast('.')) }
     Column(
         modifier = Modifier.padding(
@@ -472,6 +504,13 @@ private fun DetailSheet(
         Row(horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm)) {
             if (item.outputUri != null && item.status == DownloadStatus.COMPLETED) {
                 TextButton(onClick = { showRename = true }) { Text("Rename") }
+                // Edit tags only applies to MP3 files (ID3 is MP3-specific).
+                if (item.format == AudioFormat.MP3) {
+                    TextButton(onClick = { showEditTags = true }) {
+                        Icon(Icons.Filled.Edit, contentDescription = null)
+                        Text("Edit tags")
+                    }
+                }
             }
             TextButton(onClick = onDelete) {
                 Icon(Icons.Filled.Delete, contentDescription = "Delete entry")
@@ -503,6 +542,70 @@ private fun DetailSheet(
             dismissButton = { TextButton(onClick = { showRename = false }) { Text("Batal") } },
         )
     }
+    if (showEditTags) {
+        EditTagsDialog(
+            initialTitle = item.title,
+            initialArtist = item.artist.orEmpty(),
+            onDismiss = { showEditTags = false },
+            onSave = { title, artist ->
+                onEditTags(title, artist)
+                showEditTags = false
+            },
+        )
+    }
+}
+
+@Composable
+private fun EditTagsDialog(
+    initialTitle: String,
+    initialArtist: String,
+    onDismiss: () -> Unit,
+    onSave: (title: String, artist: String) -> Unit,
+) {
+    var title by remember { mutableStateOf(initialTitle) }
+    var artist by remember { mutableStateOf(initialArtist) }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs),
+            ) {
+                Icon(Icons.Filled.Edit, contentDescription = null)
+                Text("Edit tag MP3")
+            }
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.sm)) {
+                Text(
+                    "Ubah judul dan artis yang tersimpan di dalam file MP3.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                OutlinedTextField(
+                    value = title,
+                    onValueChange = { title = it.take(200) },
+                    label = { Text("Judul") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                OutlinedTextField(
+                    value = artist,
+                    onValueChange = { artist = it.take(200) },
+                    label = { Text("Artis (opsional)") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = { onSave(title, artist) },
+                enabled = title.isNotBlank(),
+            ) { Text("Simpan") }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Batal") } },
+    )
 }
 
 @Composable

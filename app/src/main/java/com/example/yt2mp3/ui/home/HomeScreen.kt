@@ -1,6 +1,8 @@
 package com.example.yt2mp3.ui.home
 
+import android.app.Activity
 import android.app.Application
+import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -12,6 +14,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -39,6 +42,7 @@ import androidx.compose.material.icons.filled.LibraryMusic
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Public
+import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.AlertDialog
@@ -197,6 +201,32 @@ fun HomeScreen(
         }
     }
 
+    val qrLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val scanned = result.data?.getStringExtra("SCAN_RESULT")
+                ?: result.data?.getStringExtra("com.google.zxing.client.android.SCAN.SCAN_RESULT")
+                ?: result.data?.dataString
+            if (!scanned.isNullOrBlank()) {
+                vm.onInputChange(scanned.trim())
+                pastedTick = true
+                focus.clearFocus()
+                vm.submit()
+            }
+        }
+    }
+    val scanQr = {
+        val intent = Intent("com.google.zxing.client.android.SCAN").apply {
+            putExtra("SCAN_MODE", "QR_CODE_MODE")
+        }
+        try {
+            qrLauncher.launch(intent)
+        } catch (_: Exception) {
+            vm.showNotice("Tidak ada aplikasi scanner QR. Instal Google Lens atau aplikasi scanner QR.")
+        }
+    }
+
     // One-time subtle highlight when the destination changes (§30).
     var destFlash by remember { mutableStateOf(false) }
     LaunchedEffect(state.destinationLabel) {
@@ -218,7 +248,7 @@ fun HomeScreen(
     }
 
     Column(Modifier.fillMaxSize()) {
-        TopAppBar(title = { Text("YT2MP3") })
+        TopAppBar(title = { Text("Downlink") })
         Column(
             Modifier
                 .fillMaxSize()
@@ -256,7 +286,13 @@ fun HomeScreen(
                 keyboardActions = KeyboardActions(onSearch = { submit() }),
             )
 
-            Row(horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm)) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
                 OutlinedButton(onClick = {
                     clipboard.getText()?.text?.takeIf { it.isNotBlank() }?.let {
                         vm.onInputChange(it.trim())
@@ -270,6 +306,11 @@ fun HomeScreen(
                     )
                     Spacer(Modifier.padding(end = AppSpacing.xs))
                     Text(if (pastedTick) "Pasted" else "Paste")
+                }
+                OutlinedButton(onClick = scanQr) {
+                    Icon(Icons.Filled.QrCodeScanner, contentDescription = null)
+                    Spacer(Modifier.padding(end = AppSpacing.xs))
+                    Text("Scan QR")
                 }
                 OutlinedButton(onClick = { importPicker.launch(arrayOf("text/plain", "text/csv", "application/json")) }) {
                     Icon(Icons.Filled.FolderOpen, contentDescription = null)
@@ -402,7 +443,7 @@ fun HomeScreen(
 
             if (state.content is HomeContent.Idle) {
                 Text(
-                    "Tip: di aplikasi lain, tekan Share → YT2MP3 untuk langsung membuka link di sini. " +
+                    "Tip: di aplikasi lain, tekan Share → Downlink untuk langsung membuka link di sini. " +
                         "Bisa tempel banyak link sekaligus atau import file TXT/CSV/JSON. " +
                         "Hanya untuk konten publik yang boleh disimpan; konten privat/berbayar/DRM tidak didukung.",
                     style = MaterialTheme.typography.bodySmall,
@@ -418,7 +459,7 @@ fun HomeScreen(
             title = { Text("Penting: hak cipta & penggunaan") },
             text = {
                 Text(
-                    "YT2MP3 hanya untuk konten publik yang kamu miliki atau diizinkan menyimpan " +
+                    "Downlink hanya untuk konten publik yang kamu miliki atau diizinkan menyimpan " +
                         "untuk dipakai offline pribadi.\n\nDilarang: konten privat/login-only, konten " +
                         "berbayar, dan mem-bypass DRM atau proteksi akses. Patuhi syarat layanan tiap situs.",
                     style = MaterialTheme.typography.bodyMedium,

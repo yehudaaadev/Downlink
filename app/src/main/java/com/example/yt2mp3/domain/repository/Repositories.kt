@@ -51,6 +51,8 @@ interface DownloadRepository {
     suspend fun reorder(id: Long, dir: Int)
     /** Moves an item to the front of the queue. */
     suspend fun moveToTop(id: Long)
+    /** Updates the title and artist tag stored in history (after tag editing). */
+    suspend fun updateTitleArtist(id: Long, title: String, artist: String?)
 }
 
 interface SettingsRepository {
@@ -135,3 +137,4 @@ interface SettingsRepository {
     suspend fun setSimpleMode(enabled: Boolean)
     suspend fun clearAll()
 }
+
