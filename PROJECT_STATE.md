@@ -25,14 +25,14 @@ Downlink (sebelumnya YT2MP3) adalah aplikasi Android offline media downloader & 
 6. Granular SponsorBlock Configuration: Penambahan seleksi kategori terpisah (Sponsor, Intro/Outro, Non-music klip, Self-promo, Ajakan interaksi) di Home dan Settings (`VideoModels.kt`, `YtDlpEngine.kt`, `SettingsScreen.kt`, `HomeScreen.kt`).
 7. Visual Storage Analyzer: Bar multi-warna distribusi memori (Audio, Video, Lainnya), penghitungan sisa ruang drive, pemindai ulang, dan pembersihan berkas temp cache aplikasi (`StorageManager.kt`, `SettingsScreen.kt`).
 8. Built-in 5-Band Equalizer & Audio FX di Pemutar: Integrasi native `android.media.audiofx.Equalizer` dan `BassBoost` pada sesi audio `MediaPlayer`, ModalBottomSheet interaktif dengan master switch, preset musik bawaan (Flat, Rock, Pop, Jazz, dll), 5-band slider grafis (dB), dan kontrol bass boost (`PlayerScreen.kt`).
+9. Interactive Stream Inspector: Model `StreamFormatInfo` dan ekstraksi array `formats` dari probe JSON yt-dlp, tombol "Inspeksi Stream", serta ModalBottomSheet yang menampilkan rincian codec (AVC1, VP9, AV1, Opus, AAC), resolusi, FPS, bitrate, dan perkiraan ukuran berkas (`Models.kt`, `YtJson.kt`, `HomeScreen.kt`).
 
 ## Roadmap Pengembangan Bertahap
 - [x] Fitur 1: Granular SponsorBlock Configuration
 - [x] Fitur 2: Visual Storage Analyzer (Bar distribusi memori di Settings)
 - [x] Fitur 3: Built-in 5-Band Equalizer & Audio FX di Pemutar
-- [ ] Fitur 4: Interactive Stream Inspector (Daftar stream video/audio detail sebelum unduh)
+- [x] Fitur 4: Interactive Stream Inspector (Daftar stream video/audio detail sebelum unduh)
 
 ## Langkah Berikutnya
-- Lanjutkan ke Fitur 4: Interactive Stream Inspector
-- Jalankan build APK rilis: `.\gradlew.bat :app:assembleRelease`
+- Jalankan build APK rilis v1.5.0: `.\gradlew.bat :app:assembleRelease`
 - Unggah file APK rilis (`downlink-arm64-v8a-release.apk` dan `downlink-armeabi-v7a-release.apk`) ke GitHub Releases v1.5.0.

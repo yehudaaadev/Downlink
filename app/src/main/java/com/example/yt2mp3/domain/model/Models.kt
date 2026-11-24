@@ -1,5 +1,18 @@
 package com.example.yt2mp3.domain.model
 
+data class StreamFormatInfo(
+    val formatId: String,
+    val ext: String,
+    val resolution: String? = null,
+    val fps: Int? = null,
+    val vcodec: String? = null,
+    val acodec: String? = null,
+    val bitrateKbps: Int? = null,
+    val filesize: Long? = null,
+    val isVideoOnly: Boolean = false,
+    val isAudioOnly: Boolean = false,
+)
+
 data class VideoMetadata(
     val sourceUrl: String,
     val title: String,
@@ -16,6 +29,7 @@ data class VideoMetadata(
     val extractor: String? = null,
     /** Human-readable site name for the UI, e.g. "YouTube", "TikTok". */
     val siteName: String? = null,
+    val streams: List<StreamFormatInfo> = emptyList(),
 )
 
 /** A lightweight entry from search results or a playlist listing (no full extraction). */

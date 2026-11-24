@@ -35,6 +35,7 @@ object YtJson {
             playlistUrl = UrlValidator.playlistOfVideo(cleanUrl),
             extractor = extractor,
             siteName = SupportedSites.siteNameForUrl(cleanUrl),
+            streams = parseStreams(json.optJSONArray("formats"), duration),
         )
     }
 
@@ -66,6 +67,51 @@ object YtJson {
             if (best == null || f.optDouble("abr", 0.0) > best.optDouble("abr", 0.0)) best = f
         }
         return best
+    }
+
+    private fun parseStreams(formats: JSONArray?, durationSecs: Long?): List<com.example.yt2mp3.domain.model.StreamFormatInfo> {
+        if (formats == null) return emptyList()
+        val list = mutableListOf<com.example.yt2mp3.domain.model.StreamFormatInfo>()
+        for (i in 0 until formats.length()) {
+            val f = formats.optJSONObject(i) ?: continue
+            val fid = f.str("format_id") ?: continue
+            val ext = f.str("ext").orEmpty()
+            if (ext == "mhtml" || f.str("format_note")?.contains("storyboard", ignoreCase = true) == true) continue
+
+            val vcodec = f.str("vcodec")
+            val acodec = f.str("acodec")
+            val isVideoOnly = vcodec != null && vcodec != "none" && (acodec == null || acodec == "none")
+            val isAudioOnly = (vcodec == null || vcodec == "none") && acodec != null && acodec != "none"
+            val width = f.optInt("width", -1)
+            val height = f.optInt("height", -1)
+            val resolution = if (height > 0) {
+                if (width > 0) "${width}x${height}" else "${height}p"
+            } else {
+                f.str("resolution")
+            }
+            val fps = f.optInt("fps", -1).takeIf { it > 0 }
+            val tbr = f.optDouble("tbr", Double.NaN).takeIf { !it.isNaN() && it > 0 }?.toInt()
+                ?: f.optDouble("abr", Double.NaN).takeIf { !it.isNaN() && it > 0 }?.toInt()
+                ?: f.optDouble("vbr", Double.NaN).takeIf { !it.isNaN() && it > 0 }?.toInt()
+
+            val size = f.sizeBytes(durationSecs)
+
+            list.add(
+                com.example.yt2mp3.domain.model.StreamFormatInfo(
+                    formatId = fid,
+                    ext = ext,
+                    resolution = resolution,
+                    fps = fps,
+                    vcodec = vcodec.takeIf { it != "none" },
+                    acodec = acodec.takeIf { it != "none" },
+                    bitrateKbps = tbr,
+                    filesize = size,
+                    isVideoOnly = isVideoOnly,
+                    isAudioOnly = isAudioOnly,
+                ),
+            )
+        }
+        return list
     }
 
     fun entries(json: JSONObject): List<VideoEntry> {

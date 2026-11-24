@@ -22,7 +22,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -30,6 +34,7 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.ChatBubble
 import androidx.compose.material.icons.filled.Check
@@ -57,6 +62,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SegmentedButton
@@ -66,6 +72,8 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -757,6 +765,156 @@ private fun PreviewCard(meta: VideoMetadata) {
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+            if (meta.streams.isNotEmpty()) {
+                var showStreamsSheet by remember { mutableStateOf(false) }
+                OutlinedButton(
+                    onClick = { showStreamsSheet = true },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Icon(Icons.AutoMirrored.Filled.List, contentDescription = null)
+                    Spacer(Modifier.width(AppSpacing.xs))
+                    Text("Inspeksi Stream (${meta.streams.size} format)")
+                }
+                if (showStreamsSheet) {
+                    StreamInspectorSheet(
+                        streams = meta.streams,
+                        onDismiss = { showStreamsSheet = false },
+                    )
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun StreamInspectorSheet(
+    streams: List<com.example.yt2mp3.domain.model.StreamFormatInfo>,
+    onDismiss: () -> Unit,
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = AppSpacing.screen, vertical = AppSpacing.sm),
+            verticalArrangement = Arrangement.spacedBy(AppSpacing.sm),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Column {
+                    Text("Detail Stream Audio & Video", style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        "${streams.size} format stream terdeteksi dari server sumber",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                IconButton(onClick = onDismiss) {
+                    Icon(Icons.Filled.Clear, contentDescription = "Tutup")
+                }
+            }
+
+            HorizontalDivider()
+
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 480.dp),
+                verticalArrangement = Arrangement.spacedBy(AppSpacing.xs),
+            ) {
+                items(streams) { stream ->
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                        ),
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(AppSpacing.sm),
+                            verticalArrangement = Arrangement.spacedBy(AppSpacing.xs),
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs),
+                                ) {
+                                    val kindLabel = when {
+                                        stream.isAudioOnly -> "AUDIO ONLY"
+                                        stream.isVideoOnly -> "VIDEO ONLY"
+                                        else -> "AUDIO + VIDEO"
+                                    }
+                                    val kindColor = when {
+                                        stream.isAudioOnly -> Color(0xFF2E7D32)
+                                        stream.isVideoOnly -> Color(0xFF1976D2)
+                                        else -> Color(0xFF8E24AA)
+                                    }
+                                    Text(
+                                        kindLabel,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = kindColor,
+                                    )
+                                    Text(
+                                        "ID: ${stream.formatId}",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
+                                stream.ext.takeIf { it.isNotBlank() }?.let {
+                                    Text(
+                                        it.uppercase(),
+                                        style = MaterialTheme.typography.labelMedium,
+                                        color = MaterialTheme.colorScheme.primary,
+                                    )
+                                }
+                            }
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                            ) {
+                                val resLabel = buildString {
+                                    append(stream.resolution ?: if (stream.isAudioOnly) "Audio" else "Unknown")
+                                    stream.fps?.let { append(" (${it}fps)") }
+                                }
+                                Text(resLabel, style = MaterialTheme.typography.bodyMedium)
+
+                                stream.filesize?.let {
+                                    Text(
+                                        com.example.yt2mp3.domain.model.SizeEstimator.formatBytes(it),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
+                            }
+
+                            val codecLine = buildString {
+                                stream.vcodec?.let { append("Video: $it") }
+                                if (stream.vcodec != null && stream.acodec != null) append(" · ")
+                                stream.acodec?.let { append("Audio: $it") }
+                                stream.bitrateKbps?.let { append(" · ${it} kbps") }
+                            }
+                            if (codecLine.isNotEmpty()) {
+                                Text(
+                                    codecLine,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+            Spacer(Modifier.height(AppSpacing.xs))
         }
     }
 }
