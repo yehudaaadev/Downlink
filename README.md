@@ -1,5 +1,13 @@
 # Downlink — Pengunduh Audio/Video Publik (1000+ Situs)
 
+[![Unduh APK Terbaru](https://img.shields.io/badge/Download-Latest_APK-238636?style=flat-square&logo=android&logoColor=white)](https://github.com/yehudaaadev/Downlink/releases/latest)
+[![Versi Rilis](https://img.shields.io/badge/Release-v1.5.0-1f2328?style=flat-square&logo=github&logoColor=white)](https://github.com/yehudaaadev/Downlink/releases/latest)
+[![Lisensi](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE)
+
+Unduh langsung APK rilis:
+- [ARM64 (HP modern / 64-bit)](https://github.com/yehudaaadev/Downlink/releases/latest/download/downlink-arm64-v8a-release.apk)
+- [ARMv7 (HP 32-bit)](https://github.com/yehudaaadev/Downlink/releases/latest/download/downlink-armeabi-v7a-release.apk)
+
 Aplikasi Android langsung-jadi-APK (Kotlin, Compose, MVVM). Tempel/share link →
 preview → pilih format → unduh di foreground → tersimpan via SAF (SD card OK) →
 riwayat. Engine (yt-dlp via youtubedl-android + FFmpeg) jalan penuh di HP;
