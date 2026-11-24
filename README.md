@@ -1,10 +1,9 @@
 # Downlink — Pengunduh Audio/Video Publik
 
-[![Unduh APK](https://img.shields.io/badge/Unduh_APK-v1.5.0-238636?style=flat-square&logo=android&logoColor=white)](https://github.com/yehudaaadev/Downlink/releases/latest)
-[![Versi Rilis](https://img.shields.io/github/v/release/yehudaaadev/Downlink?style=flat-square&color=1f2328&label=Versi)](https://github.com/yehudaaadev/Downlink/releases/latest)
-[![Platform](https://img.shields.io/badge/Platform-Android%2011%2B%20(API%2030%2B)-3DDC84?style=flat-square&logo=android&logoColor=white)](https://developer.android.com)
-[![Lisensi](https://img.shields.io/badge/Lisensi-MIT-blue?style=flat-square)](LICENSE)
-[![Status Build](https://img.shields.io/badge/Unit_Tests-54_Lolos-brightgreen?style=flat-square)](app/src/test)
+[![Versi](assets/badges/version.svg)](https://github.com/yehudaaadev/Downlink/releases/latest)
+[![Platform](assets/badges/platform.svg)](https://developer.android.com)
+[![Lisensi](assets/badges/license.svg)](LICENSE)
+[![Status Pengujian](assets/badges/tests.svg)](app/src/test)
 
 Aplikasi Android native (Kotlin, Jetpack Compose, MVVM) untuk mengunduh dan mengonversi media dari 1000+ platform publik tanpa server perantara, tanpa registrasi akun, dan tanpa iklan. Pemrosesan dilakukan sepenuhnya di perangkat menggunakan engine `yt-dlp` tersemat dan `FFmpeg`.
 
@@ -17,7 +16,7 @@ Pilih berkas instalasi sesuai dengan tipe prosesor perangkat:
 ### 1. Perangkat Modern — 64-bit (Rekomendasi Utama)
 Ditujukan untuk hampir seluruh smartphone Android modern (keluaran 2017 ke atas). Menawarkan performa decoding audio/video dan kecepatan engine yt-dlp paling optimal.
 
-[![Unduh Versi 64-bit](https://img.shields.io/badge/Unduh_APK_64--bit-ARM64_(~60_MB)-238636?style=for-the-badge&logo=android&logoColor=white)](https://github.com/yehudaaadev/Downlink/releases/latest/download/downlink-arm64-v8a-release.apk)
+[![Unduh Versi 64-bit](assets/badges/badge-64bit.svg)](https://github.com/yehudaaadev/Downlink/releases/latest/download/downlink-arm64-v8a-release.apk)
 
 - **Nama Berkas**: `downlink-arm64-v8a-release.apk`
 - **Arsitektur (ABI)**: `arm64-v8a` (AArch64)
@@ -30,7 +29,7 @@ Ditujukan untuk hampir seluruh smartphone Android modern (keluaran 2017 ke atas)
 ### 2. Perangkat Lawas — 32-bit (Kompatibilitas)
 Ditujukan untuk perangkat Android lawas atau tipe chipset hemat daya yang hanya mendukung instruksi 32-bit.
 
-[![Unduh Versi 32-bit](https://img.shields.io/badge/Unduh_APK_32--bit-ARMv7_(~53_MB)-1f2328?style=for-the-badge&logo=android&logoColor=white)](https://github.com/yehudaaadev/Downlink/releases/latest/download/downlink-armeabi-v7a-release.apk)
+[![Unduh Versi 32-bit](assets/badges/badge-32bit.svg)](https://github.com/yehudaaadev/Downlink/releases/latest/download/downlink-armeabi-v7a-release.apk)
 
 - **Nama Berkas**: `downlink-armeabi-v7a-release.apk`
 - **Arsitektur (ABI)**: `armeabi-v7a` (ARM 32-bit)
